@@ -70,6 +70,7 @@ export function AuroraBackground({
           brightness={isWideDesktop ? (isLight ? 1.65 : 1.35) : isLight ? 1.55 : 1.15}
           opacity={1}
           quality="medium"
+          intro={false}
           paused={paused}
           dpr={1.5}
           onUnsupported={handleUnsupported}

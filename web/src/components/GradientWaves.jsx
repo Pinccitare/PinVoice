@@ -412,7 +412,7 @@ export default function GradientWaves({
       clock: 0,
       last: 0,
       raf: 0,
-      visible: false,
+      visible: true,
       introAt: -1,
       pointer: [0.5, 0.5],
       inside: false,
@@ -603,9 +603,17 @@ export default function GradientWaves({
       wake();
     };
 
+    const onContextLost = event => {
+      event.preventDefault();
+      onUnsupported?.();
+    };
+    canvas.addEventListener('webglcontextlost', onContextLost);
+
     const visibility = new IntersectionObserver(entries => {
-      state.visible = entries.some(entry => entry.isIntersecting);
-      wake();
+      if (entries.length > 0) {
+        state.visible = entries.some(entry => entry.isIntersecting);
+        wake();
+      }
     });
     visibility.observe(container);
     const sizes = new ResizeObserver(measure);
@@ -620,6 +628,7 @@ export default function GradientWaves({
     return () => {
       cancelAnimationFrame(state.raf);
       wakeRef.current = null;
+      canvas.removeEventListener('webglcontextlost', onContextLost);
       document.removeEventListener('visibilitychange', wake);
       visibility.disconnect();
       sizes.disconnect();
