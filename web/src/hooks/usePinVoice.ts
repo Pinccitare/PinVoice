@@ -56,6 +56,7 @@ export function usePinVoice(settings: PinVoiceSettings) {
   );
   const [isReformatting, setIsReformatting] = useState(false);
   const [isCloudConnected, setIsCloudConnected] = useState(false);
+  const [streamingText, setStreamingText] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastNotice | null>(null);
 
   const recorderRef = useRef<EphemeralAudioRecorder | null>(null);
@@ -445,6 +446,7 @@ export function usePinVoice(settings: PinVoiceSettings) {
       }
 
       const audioBase64 = await blobToBase64(audioRef.blob);
+      setStreamingText('');
       const result = await processClinicalAudioWithGemini({
         apiKey: settings.geminiApiKey,
         model: settings.geminiModel,
@@ -452,9 +454,11 @@ export function usePinVoice(settings: PinVoiceSettings) {
         mimeType: audioRef.mimeType,
         templates: currentTemplates,
         lockedTemplateId,
+        onPartialText: (preview) => setStreamingText(preview),
       });
 
       audioRef = null;
+      setStreamingText(null);
 
       const evolution = buildEvolutionFromGemini(result, currentTemplates, 24 * 3650);
       await db.evolutions.put(evolution);
@@ -483,6 +487,7 @@ export function usePinVoice(settings: PinVoiceSettings) {
           : 'Erro ao processar áudio.',
       );
     } finally {
+      setStreamingText(null);
       setComplementTargetId(null);
       setRecordingSeconds(0);
       setRecordingState('idle');
@@ -682,6 +687,7 @@ export function usePinVoice(settings: PinVoiceSettings) {
     isOnline,
     isReformatting,
     isCloudConnected,
+    streamingText,
     toast,
     showToast,
     startRecording,

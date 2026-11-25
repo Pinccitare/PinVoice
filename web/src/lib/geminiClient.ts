@@ -74,11 +74,28 @@ function compactBlockHint(blockId: string, hint: string): string {
   return hint.length > 140 ? `${hint.slice(0, 137)}...` : hint;
 }
 
+function getStyleRule(lockedTemplateId: string | null): string {
+  switch (lockedTemplateId) {
+    case 'cirurgica':
+      return 'ESTILO CIRÚRGICA: direto (HDA+evolução juntas) + EF SOMENTE descrito no áudio (sem preencher sistemas não citados).';
+    case 'ps':
+      return 'ESTILO PS: direto (HDA+evolução juntas) + EF COMPLETO fisiológico padrão nos sistemas não citados.';
+    case 'clinica':
+      return 'ESTILO CLÍNICA: cronológico completo (HDA e Evolução 12h/24h separados) + EF COMPLETO fisiológico padrão nos não citados.';
+    case 'uti':
+      return 'ESTILO UTI: direto/cronológico (evolução 24h em HDA) + EF COMPLETO fisiológico padrão nos não citados.';
+    case 'aps':
+      return 'ESTILO APS: método SOAP completo + EF COMPLETO fisiológico padrão nos não citados.';
+    default:
+      return 'ESTILO: CIRÚRGICA direto (HDA+evolução juntas)+EF SOMENTE descrito; PS direto+EF COMPLETO; CLÍNICA cronológico completo+EF COMPLETO; UTI direto/cronológico+EF COMPLETO; APS SOAP+EF COMPLETO.';
+  }
+}
+
 export function buildClinicalSystemInstruction(
   templates: ClinicalTemplate[],
   lockedTemplateId: string | null,
 ): string {
-  // Quando há trava manual, envia apenas o template travado (corta ~80% dos tokens de entrada)
+  // Opção B: quando há trava manual, envia apenas o template travado e a regra de estilo dele
   const relevantTemplates = lockedTemplateId
     ? templates.filter((t) => t.id === lockedTemplateId)
     : templates;
@@ -98,16 +115,26 @@ export function buildClinicalSystemInstruction(
     ? `TRAVA MANUAL: use OBRIGATORIAMENTE "${lockedTemplateId}" (selectionMode="manual").`
     : `SELEÇÃO: 1) Comando de voz explícito ("cirúrgica", "UTI", "PS/emergência", "APS", "clínica") -> selectionMode="voice" e remova o comando do texto. 2) Inferência clínica (PO/FO/dreno->cirurgica; VM/DVA/RASS->uti; UPA/PS->ps; UBS/SOAP->aps; enfermaria/DIH->clinica) -> selectionMode="auto".`;
 
-  return [
+  const lines = [
     'Motor clínico PinVoice (PT-BR técnico, sem Markdown, sem saudações, sem placeholders/colchetes).',
     '1. DIARIZAÇÃO: separe Médico vs Paciente/Acompanhante (queixas->HDA/Subjetivo; achados->Exame Físico/Objetivo; planos->Condutas/Plano).',
-    `2. ${lockInstruction} ESTILO: CIRÚRGICA direto (HDA+evolução juntas) + EF SOMENTE descrito; PS direto + EF COMPLETO; CLÍNICA cronológico completo (HDA e Evolução 12h/24h separados) + EF COMPLETO; UTI direto/cronológico + EF COMPLETO; APS SOAP + EF COMPLETO.`,
-    '3. EF COMPLETO fisiológico padrão (para sistemas não citados em Clínica/PS/UTI/APS): Geral: BEG, corado, hidratado, acianótico, anictérico, afebril | Neuro: Glasgow 15, pupilas isofotorreagentes, sem déficits focais | ACV: RCR 2T, BNF, sem sopros | AR: MV+ bilateral sem RA | ABD: Plano, flácido, RHA+, indolor | EXT: Aquecidas, bem perfundidas, TEC < 3s, sem edema, panturrilhas livres.',
+    `2. ${lockInstruction} ${getStyleRule(lockedTemplateId)}`,
+  ];
+
+  if (lockedTemplateId !== 'cirurgica') {
+    lines.push(
+      '3. EF COMPLETO fisiológico padrão (para sistemas não citados): Geral: BEG, corado, hidratado, acianótico, anictérico, afebril | Neuro: Glasgow 15, pupilas isofotorreagentes, sem déficits focais | ACV: RCR 2T, BNF, sem sopros | AR: MV+ bilateral sem RA | ABD: Plano, flácido, RHA+, indolor | EXT: Aquecidas, bem perfundidas, TEC < 3s, sem edema, panturrilhas livres.',
+    );
+  }
+
+  lines.push(
     '4. TEXTO ÚNICO INTEGRADO (sem Copilot separado): medicações, doses, dias de ATB (ex: D4 Ceftriaxona), alertas/suspensões (CAIXA ALTA), exames e pareceres vão direto em CONDUTAS/PROGRAMAÇÃO e PENDÊNCIAS (ou P — PLANO na APS).',
-    '5. OMISSÃO ESTRITA DE BLOCOS VAZIOS: retorne em blocks APENAS blocos com dados reais do áudio (exceção: EF completo nos modelos acima). Nunca escreva "Não informado", "Sem dados" ou "N/A".',
-    '6. ESCRITA E SEGURANÇA: nunca repita o título do bloco dentro de content; zero repetição de fatos no mesmo bloco ou entre blocos; SEGURANÇA PRESCRITIVA: NUNCA invente dose, via ou intervalo não falado; quebras \\n obrigatórias por sistema no EF, por item (1., 2., a), b)) em Hipóteses/Avaliação e por linha em Condutas/Pendências; use siglas padrão (%, mmHg, bpm, BNF, RCR 2T, MV+, RHA+, TEC < 3s).',
+    '5. OMISSÃO ESTRITA DE BLOCOS VAZIOS: retorne em blocks APENAS blocos com dados reais do áudio. Nunca escreva "Não informado", "Sem dados" ou "N/A".',
+    '6. ESCRITA E SEGURANÇA: nunca repita o título do bloco dentro de content; zero repetição de fatos; SEGURANÇA PRESCRITIVA: NUNCA invente dose, via ou intervalo não falado; quebras \\n obrigatórias por sistema no EF, por item (1., 2., a), b)) em Hipóteses/Avaliação e por linha em Condutas/Pendências; siglas padrão (%, mmHg, bpm, BNF, RCR 2T, MV+, RHA+, TEC < 3s).',
     `TEMPLATES:${JSON.stringify(templatesCatalog)}`,
-  ].join('\n');
+  );
+
+  return lines.join('\n');
 }
 
 interface RawGeminiPayload {
@@ -217,12 +244,82 @@ function buildModelAttemptOrder(preferred: string): string[] {
   return [clean, ...FALLBACK_MODELS.filter((m) => m !== clean)];
 }
 
+function unescapePartialJsonString(raw: string): string {
+  let out = '';
+  for (let i = 0; i < raw.length; i++) {
+    const ch = raw[i];
+    if (ch !== '\\') {
+      out += ch;
+      continue;
+    }
+    if (i + 1 >= raw.length) break;
+    const next = raw[++i];
+    if (next === 'n') out += '\n';
+    else if (next === 'r') out += '\r';
+    else if (next === 't') out += '\t';
+    else if (next === '"' || next === '\\' || next === '/') out += next;
+    else out += next;
+  }
+  return out;
+}
+
+/**
+ * Extrai em tempo real os blocos já iniciados dentro de um JSON parcial vindo do streaming,
+ * permitindo exibir o texto clínico ~0.8s–1.2s após parar a gravação.
+ */
+export function extractStreamingBlocksPreview(
+  partialJson: string,
+  templates: ClinicalTemplate[],
+  lockedTemplateId: string | null,
+): string {
+  const tplIdMatch = /"selectedTemplateId"\s*:\s*"([^"]+)"/.exec(partialJson);
+  const resolvedId = lockedTemplateId || tplIdMatch?.[1];
+  const tpl =
+    templates.find((t) => t.id === resolvedId) ?? templates[0];
+
+  const blocksIdx = partialJson.indexOf('"blocks"');
+  if (blocksIdx === -1) return '';
+
+  const slice = partialJson.slice(blocksIdx);
+  const blockRegex = /"blockId"\s*:\s*"([^"]+)"\s*,\s*"content"\s*:\s*"/g;
+  const sections: string[] = [];
+
+  let match: RegExpExecArray | null;
+  while ((match = blockRegex.exec(slice)) !== null) {
+    const blockId = match[1];
+    let i = match.index + match[0].length;
+    let escaped = false;
+    while (i < slice.length) {
+      const c = slice[i];
+      if (escaped) {
+        escaped = false;
+      } else if (c === '\\') {
+        escaped = true;
+      } else if (c === '"') {
+        break;
+      }
+      i++;
+    }
+
+    const rawContent = slice.slice(match.index + match[0].length, i);
+    const content = unescapePartialJsonString(rawContent).trim();
+    if (!content) continue;
+
+    const title =
+      tpl?.blocks.find((b) => b.id === blockId)?.title ?? blockId.toUpperCase();
+    sections.push(`${title}\n${content}`);
+  }
+
+  return sections.join('\n\n');
+}
+
 async function generateClinicalJsonWithFallback(params: {
   apiKey: string;
   model: string;
   systemInstruction: string;
   temperature: number;
   contents: Parameters<GoogleGenAI['models']['generateContent']>[0]['contents'];
+  onRawChunk?: (accumulatedJson: string) => void;
 }): Promise<string> {
   const ai = new GoogleGenAI({ apiKey: params.apiKey.trim() });
   const candidates = buildModelAttemptOrder(params.model);
@@ -232,16 +329,37 @@ async function generateClinicalJsonWithFallback(params: {
     const thinkingModes = shouldSendThinkingZero(candidateModel) ? [true, false] : [false];
     for (const useThinkingZero of thinkingModes) {
       try {
+        const requestConfig = {
+          systemInstruction: params.systemInstruction,
+          temperature: params.temperature,
+          responseMimeType: 'application/json',
+          responseSchema: CLINICAL_RESPONSE_SCHEMA,
+          ...(useThinkingZero ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
+        };
+
+        if (params.onRawChunk && typeof ai.models.generateContentStream === 'function') {
+          const stream = await ai.models.generateContentStream({
+            model: candidateModel,
+            contents: params.contents,
+            config: requestConfig,
+          });
+          let accumulated = '';
+          for await (const chunk of stream) {
+            if (chunk.text) {
+              accumulated += chunk.text;
+              params.onRawChunk(accumulated);
+            }
+          }
+          if (!accumulated.trim()) {
+            throw new Error('A API do Gemini retornou uma resposta vazia.');
+          }
+          return accumulated;
+        }
+
         const response = await ai.models.generateContent({
           model: candidateModel,
           contents: params.contents,
-          config: {
-            systemInstruction: params.systemInstruction,
-            temperature: params.temperature,
-            responseMimeType: 'application/json',
-            responseSchema: CLINICAL_RESPONSE_SCHEMA,
-            ...(useThinkingZero ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
-          },
+          config: requestConfig,
         });
 
         if (!response.text) {
@@ -273,8 +391,9 @@ export async function processClinicalAudioWithGemini(params: {
   mimeType: string;
   templates: ClinicalTemplate[];
   lockedTemplateId: string | null;
+  onPartialText?: (previewText: string) => void;
 }): Promise<GeminiClinicalResponse> {
-  const { apiKey, model, audioBase64, mimeType, templates, lockedTemplateId } = params;
+  const { apiKey, model, audioBase64, mimeType, templates, lockedTemplateId, onPartialText } = params;
   if (!apiKey.trim()) {
     throw new Error('Configure sua Gemini API Key nas Configurações antes de gravar.');
   }
@@ -294,6 +413,12 @@ export async function processClinicalAudioWithGemini(params: {
         ],
       },
     ],
+    onRawChunk: onPartialText
+      ? (acc) => {
+          const preview = extractStreamingBlocksPreview(acc, templates, lockedTemplateId);
+          if (preview) onPartialText(preview);
+        }
+      : undefined,
   });
 
   return parseGeminiClinicalPayload(rawText, templates, lockedTemplateId);

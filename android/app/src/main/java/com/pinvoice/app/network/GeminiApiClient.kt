@@ -355,6 +355,15 @@ class GeminiApiClient {
         }.toString()
     }
 
+    private fun getStyleRule(lockedTemplateId: String?): String = when (lockedTemplateId) {
+        "cirurgica" -> "ESTILO CIRÚRGICA: direto (HDA+evolução juntas) + EF SOMENTE descrito."
+        "ps" -> "ESTILO PS: direto (HDA+evolução juntas) + EF COMPLETO fisiológico nos não citados."
+        "clinica" -> "ESTILO CLÍNICA: cronológico completo + EF COMPLETO fisiológico nos não citados."
+        "uti" -> "ESTILO UTI: direto/cronológico + EF COMPLETO fisiológico nos não citados."
+        "aps" -> "ESTILO APS: método SOAP + EF COMPLETO fisiológico nos não citados."
+        else -> "ESTILO: CIRÚRGICA direto+EF SOMENTE descrito; PS/CLÍNICA/UTI/APS EF COMPLETO."
+    }
+
     private fun buildSystemInstruction(
         templates: List<ClinicalTemplate>,
         lockedTemplateId: String?,
@@ -364,10 +373,13 @@ class GeminiApiClient {
         } else {
             "SELEÇÃO: comando de voz explícito (remova o comando) ou inferência clínica automática."
         }
+        val efLine = if (lockedTemplateId == "cirurgica") "" else {
+            "\n            EF COMPLETO fisiológico padrão (não citados): Geral: BEG, corado, hidratado, acianótico, anictérico, afebril | Neuro: Glasgow 15, pupilas isofotorreagentes, sem déficits focais | ACV: RCR 2T, BNF, sem sopros | AR: MV+ bilateral sem RA | ABD: Plano, flácido, RHA+, indolor | EXT: Aquecidas, bem perfundidas, TEC < 3s, sem edema, panturrilhas livres."
+        }
         return """
             Motor clínico PinVoice (PT-BR técnico, sem Markdown, sem saudações, sem placeholders).
             1. DIARIZAÇÃO: Médico vs Paciente/Acompanhante.
-            2. $lockRule ESTILO: CIRÚRGICA direto + EF SOMENTE descrito; PS/CLÍNICA/UTI/APS EF COMPLETO (fisiológico nos não citados: Geral: BEG, corado, hidratado, acianótico, anictérico, afebril | Neuro: Glasgow 15, pupilas isofotorreagentes, sem déficits focais | ACV: RCR 2T, BNF, sem sopros | AR: MV+ bilateral sem RA | ABD: Plano, flácido, RHA+, indolor | EXT: Aquecidas, bem perfundidas, TEC < 3s, sem edema, panturrilhas livres).
+            2. $lockRule ${getStyleRule(lockedTemplateId)}$efLine
             3. TEXTO ÚNICO INTEGRADO: medicações, dias de ATB, alertas/suspensões (CAIXA ALTA) em CONDUTAS/PROGRAMAÇÃO e exames/pareceres em PENDÊNCIAS (ou P — PLANO na APS).
             4. SEGURANÇA PRESCRITIVA: NUNCA invente dose, via ou intervalo não falado.
             5. ZERO REPETIÇÃO: nunca repita título do bloco nem fatos; quebras \n entre sistemas do EF e itens/subitens.

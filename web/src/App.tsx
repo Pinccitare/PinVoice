@@ -141,6 +141,7 @@ export function App() {
               templates={pv.templates}
               hospubAsciiMode={settings.hospubAsciiMode}
               isReformatting={pv.isReformatting}
+              streamingText={pv.streamingText}
               isRecordingBusy={pv.recordingState !== 'idle'}
               isComplementRecording={
                 isComplementForActive && pv.recordingState === 'recording'

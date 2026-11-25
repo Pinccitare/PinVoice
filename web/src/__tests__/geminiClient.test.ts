@@ -17,6 +17,7 @@ vi.mock('@google/genai', async (importOriginal) => {
 
 import {
   buildClinicalSystemInstruction,
+  extractStreamingBlocksPreview,
   isThinkingUnsupportedError,
   parseGeminiClinicalPayload,
   processClinicalAudioWithGemini,
@@ -190,5 +191,21 @@ describe('geminiClient — comportamento de chamadas e fallback de thinkingConfi
       }),
     ).rejects.toThrow('bad audio');
     expect(generateContentMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('envia apenas o template travado e a regra de estilo dele quando há trava manual (Opção B)', () => {
+    const prompt = buildClinicalSystemInstruction(DEFAULT_TEMPLATES, 'cirurgica');
+    expect(prompt).toContain('"id":"cirurgica"');
+    expect(prompt).not.toContain('"id":"clinica"');
+    expect(prompt).not.toContain('"id":"aps"');
+    expect(prompt).not.toContain('EF COMPLETO fisiológico padrão');
+  });
+
+  it('extrai preview incremental em tempo real durante streaming JSON (Opção A)', () => {
+    const partial =
+      '{"selectedTemplateId":"ps","selectionMode":"auto","patientLabel":"Ana","blocks":[{"blockId":"cabecalho","content":"Ana, 30a."},{"blockId":"hda","content":"Dor abdominal há 2h\\nSem febre';
+    const preview = extractStreamingBlocksPreview(partial, DEFAULT_TEMPLATES, null);
+    expect(preview).toContain('EVOLUÇÃO MÉDICA HOSPITALAR\nAna, 30a.');
+    expect(preview).toContain('HISTÓRIA DA DOENÇA ATUAL\nDor abdominal há 2h\nSem febre');
   });
 });

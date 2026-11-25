@@ -42,6 +42,7 @@ interface EvolutionEditorProps {
   templates: ClinicalTemplate[];
   hospubAsciiMode: boolean;
   isReformatting: boolean;
+  streamingText?: string | null;
   isRecordingBusy: boolean;
   isComplementRecording: boolean;
   isComplementProcessing: boolean;
@@ -68,6 +69,7 @@ export function EvolutionEditor({
   templates,
   hospubAsciiMode,
   isReformatting,
+  streamingText = null,
   isRecordingBusy,
   isComplementRecording,
   isComplementProcessing,
@@ -281,6 +283,35 @@ export function EvolutionEditor({
       flushPendingSave(true);
     }, 350);
   };
+
+  if (streamingText !== null) {
+    return (
+      <div className="pv-glass-strong flex flex-col rounded-2xl overflow-hidden">
+        <div
+          className="flex items-center justify-between gap-2 border-b px-4 py-3"
+          style={{ borderColor: 'var(--pv-border)' }}
+        >
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#10B981]">
+            <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
+            <span>Gerando evolução ao vivo (streaming)...</span>
+          </div>
+          <Loader2 className="h-4 w-4 animate-spin text-[#0D9488]" />
+        </div>
+        <div className="flex-1 p-4">
+          <div
+            className="min-h-[340px] whitespace-pre-wrap rounded-xl border p-4 font-sans text-[14px] leading-relaxed"
+            style={{
+              background: 'var(--pv-bg-input)',
+              borderColor: 'var(--pv-border)',
+              color: 'var(--pv-text)',
+            }}
+          >
+            {streamingText || 'Ouvindo áudio clínico...'}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!evolution) {
     return (
