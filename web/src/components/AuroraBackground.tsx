@@ -55,18 +55,18 @@ export function AuroraBackground({
           backgroundColor="transparent"
           lightMode={isLight}
           speed={0.5}
-          amplitude={isWideDesktop ? 2.1 : 1.8}
+          amplitude={isWideDesktop ? 2.8 : 2.3}
           relief={1}
           lightAngle={150}
-          mouseInteraction
-          swellOnClick
-          waveScale={isWideDesktop ? 0.72 : 0.9}
+          mouseInteraction={false}
+          swellOnClick={false}
+          waveScale={isWideDesktop ? 0.38 : 0.5}
           swell={25}
-          turbulence={28}
-          tilt={isWideDesktop ? 48 : 62}
-          zoom={isWideDesktop ? 0.72 : 1}
-          height={isWideDesktop ? 7.2 : 5.5}
-          fogDepth={isWideDesktop ? 24 : 15}
+          turbulence={20}
+          tilt={isWideDesktop ? 54 : 60}
+          zoom={isWideDesktop ? 1.05 : 1.1}
+          height={isWideDesktop ? 6.5 : 5.5}
+          fogDepth={isWideDesktop ? 26 : 18}
           brightness={isWideDesktop ? (isLight ? 1.65 : 1.35) : isLight ? 1.55 : 1.15}
           opacity={1}
           quality="medium"
