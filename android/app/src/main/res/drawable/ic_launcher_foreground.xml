@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Ondas sonoras ao fundo (paleta do relógio: Índigo -> Azul -> Ciano -> Esmeralda) -->
+    <path android:pathData="M24,47 L24,61" android:strokeWidth="2.8" android:strokeColor="#4F67B8" android:strokeAlpha="0.42" android:strokeLineCap="round" />
+    <path android:pathData="M31.5,39 L31.5,69" android:strokeWidth="2.8" android:strokeColor="#426DB9" android:strokeAlpha="0.42" android:strokeLineCap="round" />
+    <path android:pathData="M39,32 L39,76" android:strokeWidth="2.8" android:strokeColor="#3574BA" android:strokeAlpha="0.42" android:strokeLineCap="round" />
+    <path android:pathData="M46.5,41 L46.5,67" android:strokeWidth="2.8" android:strokeColor="#2B7BBB" android:strokeAlpha="0.42" android:strokeLineCap="round" />
+    <path android:pathData="M54,29 L54,79" android:strokeWidth="2.8" android:strokeColor="#1D85A9" android:strokeAlpha="0.42" android:strokeLineCap="round" />
+    <path android:pathData="M61.5,38 L61.5,70" android:strokeWidth="2.8" android:strokeColor="#128E98" android:strokeAlpha="0.42" android:strokeLineCap="round" />
+    <path android:pathData="M69,33 L69,75" android:strokeWidth="2.8" android:strokeColor="#0D9488" android:strokeAlpha="0.42" android:strokeLineCap="round" />
+    <path android:pathData="M76.5,41 L76.5,67" android:strokeWidth="2.8" android:strokeColor="#0FA285" android:strokeAlpha="0.42" android:strokeLineCap="round" />
+    <path android:pathData="M84,47 L84,61" android:strokeWidth="2.8" android:strokeColor="#10B981" android:strokeAlpha="0.42" android:strokeLineCap="round" />
+
+    <!-- Monograma geométrico PV inspirado no formato enviado, na paleta PinVoice -->
+    <!-- Parte P (haste inclinada superior + arco D + barra horizontal) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M41,47 L33,31 L54,31 C65,31 65,51 54,51 L34,51 L49,80"
+        android:strokeWidth="4.6"
+        android:strokeColor="#F8FAFC"
+        android:strokeLineCap="butt"
+        android:strokeLineJoin="miter" />
+
+    <!-- Parte V (haste interna inclinada + vértice + haste direita ascendente em Ciano/Esmeralda) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M46,59 L56,79 L79,31"
+        android:strokeWidth="4.6"
+        android:strokeColor="#10B981"
+        android:strokeLineCap="butt"
+        android:strokeLineJoin="miter" />
+</vector>
