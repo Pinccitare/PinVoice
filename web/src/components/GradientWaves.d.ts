@@ -30,6 +30,7 @@ export interface GradientWavesProps {
   swellOnClick?: boolean;
   paused?: boolean;
   dpr?: number;
+  onUnsupported?: () => void;
   className?: string;
   style?: CSSProperties;
 }

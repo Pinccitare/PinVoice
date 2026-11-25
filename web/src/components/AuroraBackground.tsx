@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import GradientWaves from './GradientWaves';
+import { WaveFallbackCanvas } from './WaveFallbackCanvas';
 
 interface AuroraBackgroundProps {
   theme?: 'dark' | 'light';
@@ -12,9 +13,14 @@ export function AuroraBackground({
   paused = false,
 }: AuroraBackgroundProps) {
   const isLight = theme === 'light';
+  const [webglUnsupported, setWebglUnsupported] = useState(false);
   const [isWideDesktop, setIsWideDesktop] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth >= 768 : false,
   );
+
+  const handleUnsupported = useCallback(() => {
+    setWebglUnsupported(true);
+  }, []);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 768px)');
@@ -39,32 +45,37 @@ export function AuroraBackground({
         }}
       />
 
-      <GradientWaves
-        horizonColor="#1e3a8a"
-        waveColor={isLight ? '#0284c7' : '#38bdf8'}
-        crestColor={isLight ? '#38bdf8' : '#e0f2fe'}
-        backgroundColor="transparent"
-        lightMode={isLight}
-        speed={0.5}
-        amplitude={isWideDesktop ? 2.1 : 1.8}
-        relief={1}
-        lightAngle={150}
-        mouseInteraction
-        swellOnClick
-        waveScale={isWideDesktop ? 0.72 : 0.9}
-        swell={25}
-        turbulence={28}
-        tilt={isWideDesktop ? 48 : 62}
-        zoom={isWideDesktop ? 0.72 : 1}
-        height={isWideDesktop ? 7.2 : 5.5}
-        fogDepth={isWideDesktop ? 24 : 15}
-        brightness={isWideDesktop ? (isLight ? 1.65 : 1.35) : isLight ? 1.55 : 1.15}
-        opacity={1}
-        quality="medium"
-        paused={paused}
-        dpr={1.5}
-        style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
-      />
+      {webglUnsupported ? (
+        <WaveFallbackCanvas isLight={isLight} paused={paused} />
+      ) : (
+        <GradientWaves
+          horizonColor="#1e3a8a"
+          waveColor={isLight ? '#0284c7' : '#38bdf8'}
+          crestColor={isLight ? '#38bdf8' : '#e0f2fe'}
+          backgroundColor="transparent"
+          lightMode={isLight}
+          speed={0.5}
+          amplitude={isWideDesktop ? 2.1 : 1.8}
+          relief={1}
+          lightAngle={150}
+          mouseInteraction
+          swellOnClick
+          waveScale={isWideDesktop ? 0.72 : 0.9}
+          swell={25}
+          turbulence={28}
+          tilt={isWideDesktop ? 48 : 62}
+          zoom={isWideDesktop ? 0.72 : 1}
+          height={isWideDesktop ? 7.2 : 5.5}
+          fogDepth={isWideDesktop ? 24 : 15}
+          brightness={isWideDesktop ? (isLight ? 1.65 : 1.35) : isLight ? 1.55 : 1.15}
+          opacity={1}
+          quality="medium"
+          paused={paused}
+          dpr={1.5}
+          onUnsupported={handleUnsupported}
+          style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
+        />
+      )}
     </div>
   );
 }

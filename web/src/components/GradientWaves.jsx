@@ -268,6 +268,7 @@ export default function GradientWaves({
   swellOnClick = true,
   paused = false,
   dpr = 2,
+  onUnsupported,
   className = '',
   style
 }) {
@@ -322,16 +323,18 @@ export default function GradientWaves({
     const canvas = document.createElement('canvas');
     canvas.className = CANVAS;
     container.appendChild(canvas);
-    const gl = canvas.getContext('webgl2', {
-      alpha: true,
-      antialias: false,
-      depth: false,
-      stencil: false,
-      premultipliedAlpha: true,
-      powerPreference: 'high-performance'
-    });
+    const gl =
+      canvas.getContext('webgl2', {
+        alpha: true,
+        antialias: false,
+        depth: false,
+        stencil: false,
+        premultipliedAlpha: true,
+        powerPreference: 'high-performance'
+      }) || canvas.getContext('webgl2', { alpha: true });
     if (!gl) {
       canvas.remove();
+      onUnsupported?.();
       return undefined;
     }
     const vertex = compile(gl, gl.VERTEX_SHADER, VERTEX);
@@ -339,6 +342,7 @@ export default function GradientWaves({
     const program = gl.createProgram();
     if (!vertex || !fragment || !program) {
       canvas.remove();
+      onUnsupported?.();
       return undefined;
     }
     gl.attachShader(program, vertex);
@@ -350,6 +354,7 @@ export default function GradientWaves({
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       gl.deleteProgram(program);
       canvas.remove();
+      onUnsupported?.();
       return undefined;
     }
     const names = [
