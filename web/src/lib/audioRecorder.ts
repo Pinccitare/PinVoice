@@ -3,10 +3,17 @@
  * Nenhum áudio é persistido em disco ou Storage de nuvem.
  */
 
+export const MIN_RECORDING_DURATION_MS = 3500;
+
+export function isRecordingTooShort(durationMs: number): boolean {
+  return durationMs < MIN_RECORDING_DURATION_MS;
+}
+
 export interface RecordedAudio {
   blob: Blob;
   mimeType: string;
   durationSec: number;
+  durationMs: number;
 }
 
 const PREFERRED_MIME_TYPES = [
@@ -106,7 +113,8 @@ export class EphemeralAudioRecorder {
 
       const recorder = this.mediaRecorder;
       recorder.onstop = () => {
-        const durationSec = Math.max(1, Math.round((Date.now() - this.startedAt) / 1000));
+        const durationMs = Math.max(0, Date.now() - this.startedAt);
+        const durationSec = Math.max(1, Math.round(durationMs / 1000));
         const cleanMime = this.activeMimeType.split(';')[0] || 'audio/webm';
         const blob = new Blob(this.chunks, { type: cleanMime });
         // Zera imediatamente os chunks internos em RAM
@@ -115,6 +123,7 @@ export class EphemeralAudioRecorder {
           blob,
           mimeType: cleanMime,
           durationSec,
+          durationMs,
         });
       };
 

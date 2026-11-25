@@ -1,6 +1,7 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { DEFAULT_TEMPLATES } from '../data/defaultTemplates';
+import { isRecordingTooShort } from '../lib/audioRecorder';
 import { db } from '../lib/db';
 import {
   enqueueOfflineAudio,
@@ -106,5 +107,12 @@ describe('offlineQueue — fila resiliente e destruição efêmera do áudio', (
     const removed = await purgeResidualAudios(24);
     expect(removed).toBe(1);
     expect(await db.pendingAudioQueue.count()).toBe(0);
+  });
+
+  it('descarta áudios menores de 3,5 segundos como erro', () => {
+    expect(isRecordingTooShort(0)).toBe(true);
+    expect(isRecordingTooShort(3499)).toBe(true);
+    expect(isRecordingTooShort(3500)).toBe(false);
+    expect(isRecordingTooShort(5200)).toBe(false);
   });
 });

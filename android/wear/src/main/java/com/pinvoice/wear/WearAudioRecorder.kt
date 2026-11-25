@@ -13,6 +13,11 @@ import java.io.File
 class WearAudioRecorder(private val context: Context) {
     private var recorder: MediaRecorder? = null
     private var currentFile: File? = null
+    private var startedAtMs: Long = 0L
+
+    companion object {
+        const val MIN_DURATION_MS = 3500L
+    }
 
     fun purgeResidualAudios() {
         context.cacheDir.listFiles()?.forEach { file ->
@@ -49,6 +54,7 @@ class WearAudioRecorder(private val context: Context) {
 
         recorder = mr
         currentFile = file
+        startedAtMs = System.currentTimeMillis()
         return file
     }
 
@@ -60,6 +66,7 @@ class WearAudioRecorder(private val context: Context) {
 
     fun stopRecording(): File? {
         val file = currentFile
+        val elapsedMs = System.currentTimeMillis() - startedAtMs
         try {
             recorder?.stop()
         } catch (_: RuntimeException) {
@@ -69,6 +76,12 @@ class WearAudioRecorder(private val context: Context) {
             recorder?.release()
             recorder = null
             currentFile = null
+            startedAtMs = 0L
+        }
+        // Descarta automaticamente áudios menores que 3,5s (toque acidental / erro)
+        if (elapsedMs < MIN_DURATION_MS) {
+            file?.delete()
+            return null
         }
         return file
     }

@@ -9,6 +9,7 @@ import { db, ensureDefaultTemplates } from '../lib/db';
 import {
   blobToBase64,
   EphemeralAudioRecorder,
+  isRecordingTooShort,
 } from '../lib/audioRecorder';
 import {
   complementEvolutionWithAudio,
@@ -369,10 +370,18 @@ export function usePinVoice(settings: PinVoiceSettings) {
 
     const activeComplementId = complementTargetId;
     setRecordingState('processing');
-    let audioRef: { blob: Blob; mimeType: string; durationSec: number } | null = null;
+    let audioRef: { blob: Blob; mimeType: string; durationSec: number; durationMs: number } | null = null;
 
     try {
       audioRef = await recorderRef.current.stop();
+      if (isRecordingTooShort(audioRef.durationMs)) {
+        audioRef = null;
+        showToast(
+          'warning',
+          'Áudio menor que 3,5s descartado automaticamente.',
+        );
+        return;
+      }
       const currentTemplates = await ensureDefaultTemplates();
 
       if (activeComplementId) {
