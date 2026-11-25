@@ -13,6 +13,9 @@ describe('renderer — omissão de blocos vazios e ordem customizada', () => {
     expect(isBlockContentEmpty('   \n  ')).toBe(true);
     expect(isBlockContentEmpty('Não informado.')).toBe(true);
     expect(isBlockContentEmpty('Sem dados')).toBe(true);
+    expect(isBlockContentEmpty('Sem antecedentes relatados no áudio.')).toBe(true);
+    expect(isBlockContentEmpty('Sem exames complementares citados.')).toBe(true);
+    expect(isBlockContentEmpty('Nenhum exame mencionado no áudio.')).toBe(true);
     expect(isBlockContentEmpty('N/A')).toBe(true);
     expect(isBlockContentEmpty('Paciente afebril, eupneico.')).toBe(false);
   });

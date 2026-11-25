@@ -42,21 +42,14 @@ export function AuroraBackground({
         waveScale={0.9}
         swell={25}
         turbulence={28}
-        opacity={isLight ? 0.68 : 0.88}
+        tilt={58}
+        zoom={0.88}
+        brightness={isLight ? 1.05 : 1.15}
+        opacity={isLight ? 0.85 : 0.95}
         quality="medium"
         paused={paused}
         dpr={1.5}
         style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
-      />
-
-      {/* Vinheta leve para manter contraste de leitura nos cartões */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: isLight
-            ? 'radial-gradient(ellipse at 50% 0%, rgba(238,244,250,0.16) 0%, rgba(238,244,250,0.48) 100%)'
-            : 'radial-gradient(ellipse at 50% 0%, rgba(5,9,20,0.12) 0%, rgba(5,9,20,0.46) 100%)',
-        }}
       />
     </div>
   );

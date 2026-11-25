@@ -1,8 +1,9 @@
 import type { ClinicalTemplate } from '../types/clinical';
 
 const EMPTY_PLACEHOLDER_PATTERNS = [
-  /^n[aã]o\s+(informado|mencionado|relatado|referido|descrito|avaliado|aplic[aá]vel)\.?$/i,
-  /^sem\s+(dados|informa[cç][oõ]es|relato)\.?$/i,
+  /^n[aã]o\s+(informad[oa]s?|mencionad[oa]s?|relatad[oa]s?|referid[oa]s?|descrit[oa]s?|avaliad[oa]s?|citad[oa]s?|identificad[oa]s?|aplic[aá]vel)\.?$/i,
+  /^(sem|nenhum[a]?|n[aã]o\s+h[aá]|n[aã]o\s+foram)\s+.{0,60}(relatad[oa]s?|mencionad[oa]s?|citad[oa]s?|descrit[oa]s?|informad[oa]s?|identificad[oa]s?|no\s+[aá]udio)\.?$/i,
+  /^sem\s+(dados|informa[cç][oõ]es|relato|queixas|antecedentes|exames(\s+complementares)?|pend[eê]ncias|condutas)\.?$/i,
   /^n\/?a\.?$/i,
   /^-+$/,
 ];

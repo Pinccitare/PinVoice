@@ -129,7 +129,7 @@ export function buildClinicalSystemInstruction(
 
   lines.push(
     '4. TEXTO ÚNICO INTEGRADO (sem Copilot separado): medicações, doses, dias de ATB (ex: D4 Ceftriaxona), alertas/suspensões (CAIXA ALTA), exames e pareceres vão direto em CONDUTAS/PROGRAMAÇÃO e PENDÊNCIAS (ou P — PLANO na APS).',
-    '5. OMISSÃO ESTRITA DE BLOCOS VAZIOS: retorne em blocks APENAS blocos com dados reais do áudio. Nunca escreva "Não informado", "Sem dados" ou "N/A".',
+    '5. OMISSÃO ESTRITA DE BLOCOS VAZIOS (CRÍTICO): retorne em blocks APENAS blocos com dados reais falados no áudio. Se antecedentes, exames complementares, condutas ou pendências NÃO foram ditos no áudio, NÃO inclua esses blocos no array. É PROIBIDO escrever frases como "Sem antecedentes relatados no áudio", "Sem exames complementares citados", "Não informado" ou "N/A".',
     '6. ESCRITA E SEGURANÇA: nunca repita o título do bloco dentro de content; zero repetição de fatos; SEGURANÇA PRESCRITIVA: NUNCA invente dose, via ou intervalo não falado; quebras \\n obrigatórias por sistema no EF, por item (1., 2., a), b)) em Hipóteses/Avaliação e por linha em Condutas/Pendências; siglas padrão (%, mmHg, bpm, BNF, RCR 2T, MV+, RHA+, TEC < 3s).',
     `TEMPLATES:${JSON.stringify(templatesCatalog)}`,
   );

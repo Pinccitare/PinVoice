@@ -48,8 +48,9 @@ data class EvolutionPayload(
 
 object ClinicalRenderer {
     private val emptyPatterns = listOf(
-        Regex("^n[aã]o\\s+(informado|mencionado|relatado|referido|descrito|avaliado|aplic[aá]vel)\\.?$", RegexOption.IGNORE_CASE),
-        Regex("^sem\\s+(dados|informa[cç][oõ]es|relato)\\.?$", RegexOption.IGNORE_CASE),
+        Regex("^n[aã]o\\s+(informad[oa]s?|mencionad[oa]s?|relatad[oa]s?|referid[oa]s?|descrit[oa]s?|avaliad[oa]s?|citad[oa]s?|identificad[oa]s?|aplic[aá]vel)\\.?$", RegexOption.IGNORE_CASE),
+        Regex("^(sem|nenhum[a]?|n[aã]o\\s+h[aá]|n[aã]o\\s+foram)\\s+.{0,60}(relatad[oa]s?|mencionad[oa]s?|citad[oa]s?|descrit[oa]s?|informad[oa]s?|identificad[oa]s?|no\\s+[aá]udio)\\.?$", RegexOption.IGNORE_CASE),
+        Regex("^sem\\s+(dados|informa[cç][oõ]es|relato|queixas|antecedentes|exames(\\s+complementares)?|pend[eê]ncias|condutas)\\.?$", RegexOption.IGNORE_CASE),
         Regex("^n/?a\\.?$", RegexOption.IGNORE_CASE),
         Regex("^-+$"),
     )
