@@ -17,6 +17,16 @@ export function AuroraBackground({
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
     >
+      {/* Fallback sutil caso algum PC de hospital esteja com WebGL2 desativado */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: isLight
+            ? 'radial-gradient(120% 80% at 50% 100%, rgba(56,189,248,0.22) 0%, rgba(30,58,138,0.12) 45%, transparent 80%)'
+            : 'radial-gradient(120% 80% at 50% 100%, rgba(56,189,248,0.18) 0%, rgba(30,58,138,0.28) 45%, transparent 80%)',
+        }}
+      />
+
       <GradientWaves
         horizonColor="#1e3a8a"
         waveColor="#38bdf8"
@@ -32,19 +42,20 @@ export function AuroraBackground({
         waveScale={0.9}
         swell={25}
         turbulence={28}
-        opacity={isLight ? 0.55 : 0.72}
+        opacity={isLight ? 0.68 : 0.88}
         quality="medium"
         paused={paused}
         dpr={1.5}
-        className="h-full w-full"
+        style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
       />
-      {/* Vinheta suave para manter contraste de leitura nos cartões */}
+
+      {/* Vinheta leve para manter contraste de leitura nos cartões */}
       <div
         className="absolute inset-0"
         style={{
           background: isLight
-            ? 'radial-gradient(ellipse at 50% 0%, rgba(238,244,250,0.22) 0%, rgba(238,244,250,0.68) 100%)'
-            : 'radial-gradient(ellipse at 50% 0%, rgba(5,9,20,0.18) 0%, rgba(5,9,20,0.64) 100%)',
+            ? 'radial-gradient(ellipse at 50% 0%, rgba(238,244,250,0.16) 0%, rgba(238,244,250,0.48) 100%)'
+            : 'radial-gradient(ellipse at 50% 0%, rgba(5,9,20,0.12) 0%, rgba(5,9,20,0.46) 100%)',
         }}
       />
     </div>
