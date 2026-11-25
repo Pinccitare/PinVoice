@@ -12,12 +12,12 @@
 :root,
 [data-theme="dark"] {
   --pv-bg: #050914;
-  --pv-bg-elevated: rgba(12, 20, 38, 0.56);
-  --pv-bg-card: rgba(15, 23, 42, 0.48);
-  --pv-bg-card-strong: rgba(11, 18, 34, 0.68);
-  --pv-bg-input: rgba(6, 11, 23, 0.64);
-  --pv-bg-pill: rgba(15, 23, 42, 0.65);
-  --pv-bg-hover: rgba(30, 41, 59, 0.55);
+  --pv-bg-elevated: rgba(12, 20, 38, 0.48);
+  --pv-bg-card: rgba(15, 23, 42, 0.40);
+  --pv-bg-card-strong: rgba(11, 18, 34, 0.54);
+  --pv-bg-input: rgba(6, 11, 23, 0.50);
+  --pv-bg-pill: rgba(15, 23, 42, 0.58);
+  --pv-bg-hover: rgba(30, 41, 59, 0.52);
   --pv-border: rgba(148, 163, 184, 0.14);
   --pv-border-strong: rgba(94, 234, 212, 0.24);
   --pv-text: #F8FAFC;
@@ -34,12 +34,12 @@
 
 [data-theme="light"] {
   --pv-bg: #EEF4FA;
-  --pv-bg-elevated: rgba(255, 255, 255, 0.66);
-  --pv-bg-card: rgba(255, 255, 255, 0.58);
-  --pv-bg-card-strong: rgba(255, 255, 255, 0.76);
-  --pv-bg-input: rgba(248, 250, 252, 0.82);
-  --pv-bg-pill: rgba(241, 245, 249, 0.82);
-  --pv-bg-hover: rgba(226, 232, 240, 0.65);
+  --pv-bg-elevated: rgba(255, 255, 255, 0.50);
+  --pv-bg-card: rgba(255, 255, 255, 0.42);
+  --pv-bg-card-strong: rgba(255, 255, 255, 0.56);
+  --pv-bg-input: rgba(248, 250, 252, 0.62);
+  --pv-bg-pill: rgba(241, 245, 249, 0.76);
+  --pv-bg-hover: rgba(226, 232, 240, 0.62);
   --pv-border: rgba(15, 23, 42, 0.1);
   --pv-border-strong: rgba(13, 148, 136, 0.3);
   --pv-text: #0F172A;

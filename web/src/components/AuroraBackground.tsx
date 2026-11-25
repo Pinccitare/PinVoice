@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import GradientWaves from './GradientWaves';
 
 interface AuroraBackgroundProps {
@@ -11,6 +12,17 @@ export function AuroraBackground({
   paused = false,
 }: AuroraBackgroundProps) {
   const isLight = theme === 'light';
+  const [isWideDesktop, setIsWideDesktop] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 768 : false,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const update = () => setIsWideDesktop(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
   return (
     <div
@@ -22,30 +34,32 @@ export function AuroraBackground({
         className="absolute inset-0"
         style={{
           background: isLight
-            ? 'radial-gradient(120% 80% at 50% 100%, rgba(56,189,248,0.22) 0%, rgba(30,58,138,0.12) 45%, transparent 80%)'
-            : 'radial-gradient(120% 80% at 50% 100%, rgba(56,189,248,0.18) 0%, rgba(30,58,138,0.28) 45%, transparent 80%)',
+            ? 'radial-gradient(120% 80% at 50% 100%, rgba(56,189,248,0.24) 0%, rgba(30,58,138,0.14) 45%, transparent 80%)'
+            : 'radial-gradient(120% 80% at 50% 100%, rgba(56,189,248,0.22) 0%, rgba(30,58,138,0.34) 45%, transparent 80%)',
         }}
       />
 
       <GradientWaves
         horizonColor="#1e3a8a"
-        waveColor="#38bdf8"
-        crestColor="#e0f2fe"
+        waveColor={isLight ? '#0284c7' : '#38bdf8'}
+        crestColor={isLight ? '#38bdf8' : '#e0f2fe'}
         backgroundColor="transparent"
         lightMode={isLight}
         speed={0.5}
-        amplitude={1.8}
+        amplitude={isWideDesktop ? 2.1 : 1.8}
         relief={1}
         lightAngle={150}
         mouseInteraction
         swellOnClick
-        waveScale={0.9}
+        waveScale={isWideDesktop ? 0.72 : 0.9}
         swell={25}
         turbulence={28}
-        tilt={58}
-        zoom={0.88}
-        brightness={isLight ? 1.05 : 1.15}
-        opacity={isLight ? 0.85 : 0.95}
+        tilt={isWideDesktop ? 48 : 62}
+        zoom={isWideDesktop ? 0.72 : 1}
+        height={isWideDesktop ? 7.2 : 5.5}
+        fogDepth={isWideDesktop ? 24 : 15}
+        brightness={isWideDesktop ? (isLight ? 1.65 : 1.35) : isLight ? 1.55 : 1.15}
+        opacity={1}
         quality="medium"
         paused={paused}
         dpr={1.5}
